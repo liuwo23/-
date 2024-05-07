@@ -2238,13 +2238,13 @@ const App = () => (
         rotation={[0, 45 * MathUtils.DEG2RAD, 0]}
         material-color={'purple'}
       /> */}
-      <LorientBackGround position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
+      {/* <LorientBackGround position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} /> */}
       <LorientBuildings position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
-      <LorientGround position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
-      <LorientMob position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
       <LorientPeople position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
+      {/* <LorientGround position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
+      <LorientMob position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
       <LorientSchema position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
-      <LorientTrees position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} />
+      <LorientTrees position ={sceneBias} actualZoom={16.945785542296452} renderOrder={2} rotation-y={0.082} /> */}
 
       {/* <color attach="background" args={["#ececec"]} />
       <Experience /> */}

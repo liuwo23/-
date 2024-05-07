@@ -6,20 +6,114 @@ Files: LorientBuildings.glb [883.08KB] > D:\projects\Threejs\r3f-vite-starter\pu
 
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { MeshBasicMaterial } from 'three'
+import { MeshBasicMaterial, EdgesGeometry, LineBasicMaterial, Color, Vector2 } from 'three'
 
 export function LorientBuildings(props) {
-  const meshBasic = new MeshBasicMaterial({color:'#909090'})
+  const meshBasic = new MeshBasicMaterial({ color: '#dfdfdf' })
+  const meshBasic2 = new MeshBasicMaterial({ color: '#d0d0d0' })
+
+  const vertexShader = `
+  // Your custom vertex shader code here
+  #include <common>
+  #include <morphtarget_pars_vertex>
+  #include <skinning_pars_vertex>
+  uniform float thickness;
+  uniform float screenspace;
+  uniform vec2 size;
+  void main() {
+      #if defined (USE_SKINNING)
+          #include <beginnormal_vertex>
+          #include <morphnormal_vertex>
+          #include <skinbase_vertex>
+          #include <skinnormal_vertex>
+          #include <defaultnormal_vertex>
+      #endif
+      #include <begin_vertex>
+      #include <morphtarget_vertex>
+      #include <skinning_vertex>
+      #include <project_vertex>
+      vec4 tNormal = vec4(normal, 0.0);
+      vec4 tPosition = vec4(transformed, 1.0);
+      #ifdef USE_INSTANCING
+          tNormal = instanceMatrix * tNormal;
+          tPosition = instanceMatrix * tPosition;
+      #endif
+      if (screenspace == 0.0) {
+          vec3 newPosition = tPosition.xyz - tNormal.xyz * thickness;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0); 
+      } else {
+          vec4 clipPosition = projectionMatrix * modelViewMatrix * tPosition;
+          vec4 clipNormal = projectionMatrix * modelViewMatrix * tNormal;
+          vec2 offset = normalize(clipNormal.xy) * thickness / size * clipPosition.w * 2.0;
+          clipPosition.xy += offset;
+          gl_Position = clipPosition;
+      }
+    }
+  `;
+
+  const fragmentShader = `
+  // Your custom fragment shader code here
+  uniform vec3 color;
+  uniform float opacity;
+  uniform float screenspace;
+
+  void main() {
+      vec4 aColor = vec4(1.0,1.0,0.0, opacity);
+      if (screenspace == 0.0){
+        gl_FragColor = aColor;
+      } else {
+        gl_FragColor = vec4(color, opacity); 
+      }
+      #include <tonemapping_fragment>
+  }
+  `;
+
+  const uniforms = {
+    // Define any custom uniforms here
+    screenspace: { value: false },  
+    color: { value: new Color(4737096) },
+    opacity: { value: 1 },
+    thickness: { value: 0.3 },
+    size: { value: new Vector2(1158, 877) }
+  };
+
 
   const { nodes, materials } = useGLTF('/models/LorientBuildings.glb')
   console.log('nodes:', nodes)
   console.log('materials:', materials)
+  const edgeGeometry = new EdgesGeometry(nodes.Rehab_1.geometry, 20)
 
   return (
     <group {...props} dispose={null}>
+      <mesh geometry={nodes.Rehab_1.geometry} material={meshBasic} />
+      <lineSegments>
+        <bufferGeometry attach="geometry" {...edgeGeometry} />
+        <lineBasicMaterial attach="material" {...new LineBasicMaterial({ color: '#909090' })} />
+      </lineSegments>
+      <mesh>
+        <bufferGeometry attach="geometry" {...nodes.Rehab_1.geometry} />
+        <shaderMaterial attach="material" uniforms={uniforms} fragmentShader={fragmentShader} vertexShader={vertexShader}/>
+      </mesh>
+      {/* <lineSegments>
+        <bufferGeometry attach="geometry" {...nodes.Rehab_2.geometry} />
+        <lineBasicMaterial attach="material" {...nodes.Rehab_2.material} />
+      </lineSegments> */}
+      {/* <lineSegments geometry={nodes.Bati_2.geometry} material={new LineBasicMaterial({ color: 'red', linewidth: 10 })} /> */}
       {/* <lineSegments geometry={nodes.batiArrettes.geometry} material={nodes.batiArrettes.material} />
       <mesh geometry={nodes.Bati.geometry} material={meshBasic} /> */}
+      {/* <mesh geometry={nodes.Activity.geometry} material={meshBasic} /> */}
+      {/* <lineSegments geometry={nodes.batiArrettes.geometry} material={new LineBasicMaterial({ color: '#909090', linewidth: 1 })} /> */}
+      {/* <group group={nodes.Bati} /> */}
+      {/* <lineSegments geometry={nodes.Bati_2.geometry} material={new LineBasicMaterial({color:'red', linewidth: 10})} /> */}
+      {/* <mesh geometry={nodes.Collectifs.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Collective.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Collective_1.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Equipments.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Equipments_1.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Equipments_2.geometry} material={meshBasic} />
       <mesh geometry={nodes.Activity.geometry} material={meshBasic} />
+      <mesh geometry={nodes.Activity.geometry} material={meshBasic} /> */}
+
     </group>
   )
 }

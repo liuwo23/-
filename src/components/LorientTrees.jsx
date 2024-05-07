@@ -12,7 +12,7 @@ export function LorientTrees(props) {
   const { nodes, materials } = useGLTF('/models/LorientTrees.glb')
   console.log("nodes:", nodes)
   console.log("materials:", materials)
-  const materialBasic = new MeshBasicMaterial({ color: "red" })
+  const materialBasic = new MeshBasicMaterial({ color: "#6c6960" })
   return (
     <group {...props} dispose={null}>
       <lineSegments geometry={nodes.mergedFoliage.geometry} material={nodes.mergedFoliage.material} />
